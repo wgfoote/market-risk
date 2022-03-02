@@ -1,0 +1,15 @@
+---
+title: "William G. Foote, Ph.D."
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+My work rides the seams between economics, finance, and underlying value chains, commodities, operations, and strategies. 
+
+I have had the privilege of being on the faculties of Pace, Clarkson, Syracuse Universities, Le Moyne and Manhattan College where I taught analytics, finance, and economics in evolving online and executive learning programs. My goal has always been to prepare students to take leadership positions through the rigorous application of data driven decision making.
+
+During my career, I have helped build an energy and commodities practice in Europe for Ernst & Young, led the quantitative capital markets team at Deloitte, and helped to establish new practices in enterprise risk management at Deloitte, Charles River Associates, and Alvarez & Marsal, as well as in my own firm.
