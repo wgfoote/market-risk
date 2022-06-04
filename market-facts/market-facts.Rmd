@@ -2,7 +2,7 @@
 title: "Volatility and Spillover: Facts of Market Life"
 authors:
   - name: William G. Foote
-    thanks: Thanks to numberous colleagues and financial engineering students at Manhattan College and Syracuse University for the organic development of the ideas in this paper.
+    thanks: Thanks to numerous colleagues and financial engineering students at Manhattan College and Syracuse University for the organic development of the ideas in this paper.
     department: Department of Business Analytics
     affiliation: Manhattan College
     location: Riverdale, NY 10471
@@ -388,11 +388,11 @@ p
 
 To tailor this picture a bit, we can use `+ ylim(0.25, 1)` to specify the y-axis limits. The dashed line depicts the 50th quantile.
 
-To what degree do our conclusions change when we perform similar analyses on the other market interactions? [TO BE DETERMINED]
+To what degree do our conclusions change when we perform similar analyses on the other market interactions? We just need to re-run the same script with the other market dyads. 
 
 ## Bayesian thoughts
 
-Alternatively, we can examine the impact of the riskiness of one market on the other using a probabilistic model. Up to this point we have implemented a robust, perhaps in a frequentist mood, model of market interaction. This allows us to form a binary hypothesis: $H_0$ no spillover, and $H_1$ spillover. We might question the acceptance or rejection of hypotheses based on the probably emphasis on the null hypothesis. We might also observe overlap of the probability that either might occur. 
+Alternatively, we can examine the impact of the riskiness of one market on the other using a probabilistic model. Up to this point we have implemented a robust, perhaps in a frequentist mood, model of market interaction. This allows us to form a binary hypothesis: $H_0$ no spillover, and $H_1$ spillover. We might question the acceptance or rejection of hypotheses based on the probability emphasis of the null hypothesis. We might also observe overlap of the probability that either might occur. 
 
 This objection raises the issue of prior expectations about the hypotheses. If we assume that each is equally probable, perhaps $Beta$ distributed then we could let the likelihood of each hypothesis directly impact our inference. If we were to update priors with posteriors, we might also be able to tune the inference further.
 
@@ -477,11 +477,9 @@ precis( m_3 )
 
 Wind and solar seem to have similar spilloever characteristics relative to clean technologies. All of the models have similarities to the quantile regressions.
 
+Pareto-Smoothed Importance Sampling and cross validation with the Leave One Out approach yields a trade-off between spillover variability and bias on the y-axis and uncertainty on the x-axis. Thick-tailed, skewed returns distributions become intelligible with this analysis. The extreme uncertainty of outliers (known-unknowns from $k$ = 0 to 0.7; unknown-unknowns for $k$ > 0.7 in tests reported by @GelmanHwangVehtari2013 and @VehtariGelmanGabry2015 ) contribute to the ability of the ICLN market to spill its uncertainty into the high variations of the TAN market all through the naive mechanism of correlation.[^PSIS]
 
-
-Pareto-Smoothed Importance Sampling and cross validation with the Leave One Out approach gives us the trade-off between spillover variability and bias on the y-axis and uncertainty on the x-axis. Thick-tailed, skewed returns distributions get their intelligibility with this analysis. The extreme uncertainty of the outliers (known-unknowns from $k$ = 0 to 0.7; unknown-unknowns for $k$ > 0.7 in tests reported by @GelmanHwangVehtari2013 and @VehtariGelmanGabry2015 ) contributes to the ability of the ICLN market to spill its uncertainty into the high variations of the TAN market all through the naive mechanism of correlation.[^PSIS]
-
-[^PSIS]: Power law distributions notoriously do not possess first, second, third, or even fourth moments analytically across the GPD parameter space, especially for $k$ (see @Embrechts2000 for examples). This divergent feature means we should rely on the more robust median, mean absolute deviation, and inter-quartile ranges (probability intervals) to summarize the outcomes of power law distributions.
+[^PSIS]: Power law distributions notoriously do not possess first, second, third, or even fourth moments analytically across the GPD parameter space, especially for $k$ (see @Embrechts2000 for examples). @Watanabe2009 develops a theory of statistical learning through which singularities in the space of estimation parameters imply that standard inference using Central Limit Theorems, Gaussian distributions, are inadmissable. The existence of divergence, at least as made intelligible through singularity theory, means we should rely on the more robust median, mean absolute deviation, and inter-quartile ranges (probability intervals) to summarize the outcomes of power law distributions. All of this also aligns well with Taleb's many warnings, examples, and inferences by @Taleb2018.
 
 ```{r psis-k-penalty }
 ## R code 7.34 McElreath2020
@@ -620,8 +618,7 @@ plot_2_grid <- function( plot1, plot2, title_1= "Default" ){
 
 The comparison of slope impact parameters across the three markets in the left panel indicates the high plausibility of information sharing across the markets on a systematic basis. In the right panel are the standard deviations, a measure of the shared information of an unsystematic nature. The joint distribution of these marginal parameters indicate a high degree of sharing of return volatility among the markets.
 
-```{r compare, eval = FALSE}
-#
+```{r compare, eval = TRUE}
 library(tidybayes.rethinking)
 m_draws <- m_4 %>%
   spread_draws( a[mid], b[mid], sigma[mid] )
@@ -633,20 +630,20 @@ p1 <- m_draws %>%
   ggplot(aes(x = b, y = as.factor(mid) ) ) +
   stat_halfeye( color = "blue") +
   xlab("volatility spill into correlation ") + ylab("market") +
-  geom_vline( xintercept = 2.00 , linetype = "dashed") + geom_vline( xintercept = 4.00, linetype = "dashed")
+  xlim( 0.0, 0.6) + 
+  geom_vline( xintercept = 0.23 , linetype = "dashed") + geom_vline( xintercept = 4.00, linetype = "dashed")
 # build sigma_V comparison
 p2 <- m_draws %>% 
   filter( sigma < 0.2) %>%  
   ggplot(aes(x = sigma, y = as.factor(mid) ) ) +
   stat_halfeye( color = "blue") +
   xlab("unanticipated spillover") + ylab("market") +
-  geom_vline( xintercept = 0.12 , linetype = "dashed") + geom_vline( xintercept = 0.14, linetype = "dashed")
+  xlim( 0.13, 0.22) +
+  geom_vline( xintercept = 0.12 , linetype = "dashed") + geom_vline( xintercept = 0.165, linetype = "dashed")
 plot_2_grid( p1, p2, title_1 = "Impact of volatility on correlation")
 #
-ggsave( "compare.pdf" )
+ggsave( "compare.png" )
 ```
-
-![](compare.pdf)
 
 To ground us in a more practical answer. We can say that a 10\% move either in ICLN or PBW volatility will induce at least a 30\% in the volatility of TAN, with moves as low as about 20\% and as high as about 45\%. A 10% move in ICLN will induce a bit more than an 18\% move in PBW, with moves as low as 6\% and as high as over 30\%. These intervals are credible with 89\% probability.
 
@@ -668,12 +665,19 @@ p1 <- PSIS_m %>%
   geom_point( shape=21 ) + 
   xlab("PSIS Pareto k") + ylab("PSIS penalty") + 
   geom_vline( xintercept = 0.7, linetype = "dashed") + 
-  ggtitle( "Market Spillover: " )
+  ggtitle( "Market Spillover: industry risk and uncertainty" )
 p1 #ggplotly( p1 )
+```
 
-```
-```
-Most of the uncertainty is found in wind (PBW) volatility on solar (TAN: green). The least uncertain market seems to be the relationship between PBW and ICLN. 
+Most of the uncertainty is found in wind (PBW) volatility on solar (TAN: green). The least uncertain market seems to be the relationship between PBW and ICLN.
+
+Finally, at least for this exercise, we can compare the Wide Area Information Criterion, also known as the Watanabe-Akaike Information Criterion, or WAIC for short, of covariance and non-covariance dependent models of market structure.[^WAIC-expl]
+
+[^WAIC-expl]: PSIS exploits the distribution of potentially outlying and influential observations using the GPD to model and measure the data point-wise with the shape  parameter $k=\xi$. Any point with $k>0.5$ will  have infinite variance and thus contribute to a concentration of points -- the thick tail. Related to this idea, WAIC is the _*log-posterior-predictive density*_ ( _lppd_, that is, the Bayesian deviance) and a penalty proportional to the variance in posterior predictions:
+$$
+WAIC(y, \Theta) = -2(lppd - \underbrace{\Sigma_i var_{\theta}\,log  \,\,p(y_i|\theta))}_{penalty}
+$$
+The penalty is related to the number of free parameters in the simulations, as @Watanabe2009 demonstrates.
 
 # What have we accomplished?
 
@@ -683,7 +687,7 @@ We can provide provisional answers to the CFO's initial questions using the work
 
 - Volatile volatility in each asset spills into each market separately. These affects are measured using both quantile regression and Bayesian statistical techniques. The two approaches seem to agree on the probable existence of market spillover.
 
-- We tested the hypothesis that one market's riskiness affects another's, probably. They do, both in systematic, $\beta$, and ideosyncratic, $\sigma$, modes. 
+- We tested the hypothesis that one market's riskiness affects another market, probably. They do, both in systematic, $\beta$, and idiosyncratic, $\sigma$, modes. 
 
 - We find that a strongly coupled market risk structure persists across TAN, PBW and ICLN assets in each pair of market combinations.
 
@@ -691,6 +695,6 @@ We can provide provisional answers to the CFO's initial questions using the work
 
 The CFO should be wary that strong negative movements in one market will probably persist and spill over into negative movements across the three markets. Earnings based on this model will themselves exhibit the results of volatility clustering and market spillover.
 
-Our next step would be to build volatility clustering into a model to derive implied capital requirements through market risk channels.
+Our next step could well be to build volatility clustering, and other thick-tailed outcomes, to derive implied capital requirements through market risk channels. Such requirements would inform the risk budgeting assignments that might be built into delegations of authority, portfolio limits, even into optimiation constraints.
 
 # References
